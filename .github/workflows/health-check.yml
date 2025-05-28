@@ -2,8 +2,8 @@ name: Periodic Health Check
 
 on:
   push:
-  # schedule:
-  #   - cron: '0 12 * * *'  # один раз в день в 12:00 UTC
+  schedule:
+    - cron: '0 12 * * *'
 
 jobs:
   health-check:
