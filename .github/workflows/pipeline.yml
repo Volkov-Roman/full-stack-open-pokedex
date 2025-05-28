@@ -72,12 +72,9 @@ jobs:
       SKIP_DEPLOY: ${{ contains(join(github.event.commits.*.message, ' '), '#skip') }}
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Skip if
-        if: ${{ env.SKIP_DEPLOY == 'true' }}
-        run: echo "Skipping tag due to skip in commit"
 
       - name: Bump version and push tag
+        if: ${{ env.SKIP_DEPLOY == 'false' }}
         uses: anothrNick/github-tag-action@1.73.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
