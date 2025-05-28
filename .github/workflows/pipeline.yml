@@ -11,8 +11,8 @@ on:
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-22.04
-    outputs:
-      SKIP_DEPLOY: ${{ steps.checkskip.outputs.SKIP_DEPLOY }}
+    env:
+      SKIP_DEPLOY: ${{ contains(join(github.event.commits.*.message, ' '), '#skip') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -38,13 +38,8 @@ jobs:
       - name: Run e2e tests
         run: npm run test:e2e
       
-      - name: Check if skip is present
-        id: checkskip
-        run: |
-          echo "SKIP_DEPLOY=$(echo '${{ toJson(github.event.commits.*.message) }}' | grep -q '#skip' && echo true || echo false)" >> $GITHUB_OUTPUT
-
       - name: Trigger deployment
-        if: ${{ github.event_name == 'push' && steps.checkskip.outputs.SKIP_DEPLOY == 'false' }}
+        if: ${{ github.event_name == 'push' && env.SKIP_DEPLOY == 'false' }}
         run: |
           curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
 
@@ -57,12 +52,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Skip tagging
-        if: ${{ needs.simple_deployment_pipeline.outputs.SKIP_DEPLOY == 'true' }}
+      - name: Skip if
+        if: ${{ env.SKIP_DEPLOY == 'true' }}
         run: echo "Skipping tag due to skip in commit"
 
       - name: Bump version and push tag
-        if: ${{ needs.simple_deployment_pipeline.outputs.SKIP_DEPLOY == 'false' }}
         uses: anothrNick/github-tag-action@1.73.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
