@@ -43,26 +43,26 @@ jobs:
         run: |
           curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
 
-      - name: Notify Discord on success
-        if: success()
-        uses: rjstone/discord-webhook-notify@v1
-        with:
-          severity: info
-          text: 🚀 Deployment succeeded!
-          details: Version deployed from commit ${{ github.sha }}
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      # - name: Notify Discord on success
+      #   if: success()
+      #   uses: rjstone/discord-webhook-notify@v1
+      #   with:
+      #     severity: info
+      #     text: 🚀 Deployment succeeded!
+      #     details: Version deployed from commit ${{ github.sha }}
+      #     webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 
-      - name: Notify Discord on failure
-        if: failure()
-        uses: rjstone/discord-webhook-notify@v1
-        with:
-          severity: error
-          text: ❌ Build or test failed!
-          details: |
-            Commit: ${{ github.sha }}
-            Author: ${{ github.actor }}
-            Message: ${{ github.event.head_commit.message }}
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      # - name: Notify Discord on failure
+      #   if: failure()
+      #   uses: rjstone/discord-webhook-notify@v1
+      #   with:
+      #     severity: error
+      #     text: ❌ Build or test failed!
+      #     details: |
+      #       Commit: ${{ github.sha }}
+      #       Author: ${{ github.actor }}
+      #       Message: ${{ github.event.head_commit.message }}
+      #     webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 
   tag_release:
     needs: [simple_deployment_pipeline]
